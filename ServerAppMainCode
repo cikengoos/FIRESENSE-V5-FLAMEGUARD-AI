@@ -196,7 +196,7 @@ MANAGE_HTML = '''
 </html>
 '''
 
-# ============ HELPER FUNCTIONS ============
+# ============ HELPERS ============
 def default_bot(serial, name, location):
     return {
         'serial': serial, 'name': name, 'location': location,
@@ -228,7 +228,7 @@ def update_offline_status(bots):
             except:
                 pass
 
-# ============ FLASK ROUTES ============
+# ============ ROUTES ============
 @app.route('/')
 def index():
     bots = load_bots()
@@ -314,6 +314,5 @@ def heartbeat(serial):
 if __name__ == '__main__':
     print("\n🤖 Bot Fleet Manager Starting...")
     print(f"📁 Data file: {os.path.abspath(DATA_FILE)}")
-    print("\n✅ Open browser: http://localhost:5000")
-    print("   Or: http://192.168.238.233:5000\n")
+    print("\n✅ Open browser: http://localhost:5000\n")
     app.run(host='0.0.0.0', port=5000, debug=True)
