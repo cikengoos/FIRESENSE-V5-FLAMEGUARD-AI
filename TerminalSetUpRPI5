@@ -1,5 +1,5 @@
 # ============================================================
-# BOT FLEET MANAGER — ONE-SHOT SETUP
+# BOT FLEET MANAGER — SETUP ONLY
 # ============================================================
 
 set -e
@@ -7,45 +7,36 @@ set -e
 PROJECT_DIR="$HOME/bot_fleet"
 SERVICE_NAME="botfleet"
 
-echo "🤖 Bot Fleet Manager — Full Setup Starting..."
-echo "=============================================="
+echo "🤖 Bot Fleet Manager — Setup Only"
+echo "=================================="
 
 # --- 1. System packages ---
-echo "[1/7] Installing system packages..."
+echo "[1/6] Installing system packages..."
 sudo apt update -y
 sudo apt install -y python3-venv python3-pip
 
 # --- 2. Project structure ---
-echo "[2/7] Creating project structure..."
+echo "[2/6] Creating project structure..."
 mkdir -p "$PROJECT_DIR/server"
-mkdir -p "$PROJECT_DIR/pico"
-cd "$PROJECT_DIR"
 
 # --- 3. Virtual environment ---
-echo "[3/7] Creating virtual environment..."
+echo "[3/6] Creating virtual environment..."
 python3 -m venv "$PROJECT_DIR/venv"
 source "$PROJECT_DIR/venv/bin/activate"
 
 # --- 4. Install dependencies ---
-echo "[4/7] Installing Python dependencies..."
+echo "[4/6] Installing Python dependencies..."
 pip install --upgrade pip >/dev/null
 pip install Flask==3.0.0 gunicorn==21.2.0
 
-# --- 5. Placeholder data file ---
-echo "[5/7] Initializing data file..."
+# --- 5. Create empty files ---
+echo "[5/6] Creating files..."
+touch "$PROJECT_DIR/server/app.py"
+touch "$PROJECT_DIR/server/wsgi.py"
 [ -f "$PROJECT_DIR/server/bots_data.json" ] || echo "{}" > "$PROJECT_DIR/server/bots_data.json"
 
-# --- 6. WSGI entry point ---
-echo "[6/7] Creating wsgi.py..."
-cat > "$PROJECT_DIR/server/wsgi.py" << 'EOF'
-from app import app
-
-if __name__ == "__main__":
-    app.run()
-EOF
-
-# --- 7. Systemd service ---
-echo "[7/7] Installing systemd service..."
+# --- 6. Systemd service file (not enabled, not started) ---
+echo "[6/6] Creating systemd service file..."
 CURRENT_USER=$(whoami)
 
 sudo tee /etc/systemd/system/${SERVICE_NAME}.service > /dev/null <<EOF
@@ -67,7 +58,6 @@ WantedBy=multi-user.target
 EOF
 
 sudo systemctl daemon-reload
-sudo systemctl enable ${SERVICE_NAME}.service
 
 # --- Done ---
 IP_ADDR=$(hostname -I | awk '{print $1}')
@@ -76,12 +66,11 @@ echo "=============================================="
 echo "✅ SETUP COMPLETE"
 echo "=============================================="
 echo ""
-echo "📁 Project: $PROJECT_DIR"
-echo "🌐 Dashboard will be at: http://$IP_ADDR:5000"
+echo "📁 $PROJECT_DIR/server/app.py          (empty)"
+echo "📁 $PROJECT_DIR/server/wsgi.py         (empty)"
+echo "📁 $PROJECT_DIR/server/bots_data.json  ( { } )"
+echo "🐍 $PROJECT_DIR/venv/"
+echo "⚙️  /etc/systemd/system/${SERVICE_NAME}.service (installed, not enabled)"
 echo ""
-echo "👉 NEXT STEP: Paste your app.py into:"
-echo "   $PROJECT_DIR/server/app.py"
-echo ""
-echo "Then start the service:"
-echo "   sudo systemctl start $SERVICE_NAME"
+echo "🌐 When ready: http://$IP_ADDR:5000"
 echo ""
